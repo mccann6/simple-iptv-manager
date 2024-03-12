@@ -13,7 +13,7 @@ namespace SimpleIptvManager.Components.Clients
         private const string LiveCategoriesSampleFileName = "get_live_categories.json";
         private const string LiveStreamsByCategorySampleFileName = "get_live_streams_category.json";
         
-        public TvStreamsClientMock(HttpClient httpClient, IMemoryCache memoryCache, ILogger<BaseClient> logger) : base(httpClient, memoryCache, logger)
+        public TvStreamsClientMock(HttpClient httpClient, IMemoryCache memoryCache) : base(httpClient, memoryCache)
         {
         }
 

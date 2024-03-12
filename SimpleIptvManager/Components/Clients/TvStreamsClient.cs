@@ -9,7 +9,7 @@ namespace SimpleIptvManager.Components.Clients
         private readonly string _getLiveCategoriesAction = "get_live_categories";
         private readonly string _getLiveStreams = "get_live_streams";
 
-        public TvStreamsClient(HttpClient httpClient, IMemoryCache memoryCache, ILogger<BaseClient> logger) : base(httpClient, memoryCache, logger){}
+        public TvStreamsClient(HttpClient httpClient, IMemoryCache memoryCache) : base (httpClient, memoryCache){}
 
         public Task<PlaylistInfo> Authenticate(string host, string username, string password)
         {
