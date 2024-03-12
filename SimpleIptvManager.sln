@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIptvManager", "SimpleIptvManager\SimpleIptvManager.csproj", "{E5CA0763-694E-4ACE-B9D8-B39820E08E5C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIptvManager.Tests", "SimpleIptvManager.Tests\SimpleIptvManager.Tests.csproj", "{CD192200-76AC-460E-9CFB-F62654C0C964}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E5CA0763-694E-4ACE-B9D8-B39820E08E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5CA0763-694E-4ACE-B9D8-B39820E08E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5CA0763-694E-4ACE-B9D8-B39820E08E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD192200-76AC-460E-9CFB-F62654C0C964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD192200-76AC-460E-9CFB-F62654C0C964}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD192200-76AC-460E-9CFB-F62654C0C964}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD192200-76AC-460E-9CFB-F62654C0C964}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
