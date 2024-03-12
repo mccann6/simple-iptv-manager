@@ -1,0 +1,14 @@
+﻿@page "/"
+@attribute [StreamRendering]
+@inject Services.IPlaylistService playlistService
+
+<MudPaper Class="mt-4 pa-6">
+    <MudText Typo=Typo.h3>Simple IPTV Manager</MudText>
+    <MudText>Welcome to Simple IPTV Manager. To get started, <MudLink Href="/playlistmanager">add</MudLink> your first playlist</MudText>
+</MudPaper>
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+}

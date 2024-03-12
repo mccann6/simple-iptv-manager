@@ -1,0 +1,26 @@
+{
+  "user_info": {
+    "username": "username",
+    "password": "password",
+    "message": "",
+    "auth": 1,
+    "status": "Active",
+    "exp_date": "1748938970",
+    "is_trial": "0",
+    "active_cons": "0",
+    "created_at": "1685780570",
+    "max_connections": "1",
+    "allowed_output_formats": [ "ts" ]
+  },
+  "server_info": {
+    "url": "test.test.com",
+    "port": "80",
+    "https_port": "443",
+    "server_protocol": "http",
+    "rtmp_port": "25462",
+    "timezone": "Europe\/Amsterdam",
+    "timestamp_now": 1709397320,
+    "time_now": "2024-03-02 17:35:20",
+    "process": true
+  }
+}

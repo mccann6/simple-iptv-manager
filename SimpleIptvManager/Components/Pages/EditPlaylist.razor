@@ -1,0 +1,89 @@
+﻿@page "/editcategory"
+@inject Services.IPlaylistService playlistService
+
+<MudPaper Class="mt-4 pa-6">
+    <MudText Typo=Typo.h4>Category Editor</MudText>
+
+@if(playlist == null || categories == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudPaper>
+        <MudForm>
+            <MudGrid>
+                <MudItem xs="10">
+                    <MudTextField @bind-Value="filterText" Label="Keep Only By Filter" HelperText="@GetHelperText()" Variant="Variant.Text" />
+                </MudItem>
+                <MudItem xs="2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto mt-2" OnClick="@((e) => AddFilterToCategoryExclusion())">Filter</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+        <MudList>
+            @foreach (var category in categories)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.FeaturedPlayList">
+                    <MudGrid>
+                        <MudItem xs="10">@category.CategoryName</MudItem>
+                        <MudItem xs="2">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Href="@GetEditStreamsLink(category.CategoryId)"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => AddToCategoryExclusion(category.CategoryId))"></MudIconButton>
+                         </MudItem>
+                    </MudGrid>
+                </MudListItem>
+                <MudDivider />
+            }
+        </MudList>
+    </MudPaper>
+}
+</MudPaper>
+
+
+@code{
+    private Models.PlaylistModel? playlist;
+    private List<Models.Category>? categories;
+    private List<Models.Livestream>? streams;
+    private string filterText;
+
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        playlist = await playlistService.GetPlaylistById(Id);
+        categories = await playlistService.GetLiveCategoriesForPlaylistById(Id);
+    }
+
+    private async Task AddToCategoryExclusion(int categoryId)
+    {
+        await playlistService.AddCategoryToExclusions(Id, categoryId);
+        categories = await playlistService.GetLiveCategoriesForPlaylistById(Id);
+    }
+
+    private async Task AddFilterToCategoryExclusion()
+    {
+        await playlistService.AddCategoryFilterToExclusions(Id, filterText);
+        categories = await playlistService.GetLiveCategoriesForPlaylistById(Id);
+    }
+
+    private async Task GetStreams(int categoryId)
+    {
+        if (streams != null)
+            streams.Clear();
+        streams = await playlistService.GetLiveStreamsByCategoryId(Id, categoryId);
+    }
+
+    private string GetEditStreamsLink(int categoryId)
+    {
+        return $"/editchannels?id={Id}&categoryId={categoryId}";
+    }
+
+    private string GetHelperText()
+    {
+        return "Comma separate filters to keep, eg. \"|UK|,|US|\"";
+    }
+
+}

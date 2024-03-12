@@ -1,0 +1,109 @@
+﻿@page "/editchannels"
+@attribute [StreamRendering]
+@inject Services.IPlaylistService playlistService
+
+<MudPaper Class="mt-4 pa-6">
+    <MudText Typo=Typo.h4>Channel Editor</MudText>
+
+@if (streams == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudPaper>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto mt-2" OnClick="@((e) => SaveOverrides())">Save Channel Id Changes</MudButton>
+        <MudList>
+            @foreach (var stream in streams)
+            {
+                <MudListItem Icon="@Icons.Material.Filled.LiveTv" IconColor="GetIconColorForStream(stream)">
+                    <MudGrid>
+                        <MudItem xs="8">@stream.Name</MudItem>
+                        <MudItem xs="3">
+                                    <MudAutocomplete T="string" Label="Channel Id" @bind-Value="@stream.EpgChannelIdOverride" SearchFunc="@SearchChannels"
+                                                ResetValueOnEmptyText="false"
+                                                CoerceText="false" CoerceValue="false" />
+                        </MudItem>
+                        <MudItem xs="1">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => AddToStreamExclusion(stream.StreamId))"></MudIconButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudListItem>
+                <MudDivider />
+            }
+        </MudList>
+    </MudPaper>
+}
+</MudPaper>
+
+@code{
+    private PlaylistEntity? playlist;
+    private List<Models.Livestream>? streams;
+    private bool processed = false;
+
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+    [SupplyParameterFromQuery]
+    public int CategoryId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CategoryId != 0)
+        {
+            streams = await playlistService.GetLiveStreamsByCategoryId(Id, CategoryId);
+        }
+    }
+
+    private async Task AddToStreamExclusion(int streamId)
+    {
+        await playlistService.AddStreamToExclusions(Id, streamId);
+        streams = await playlistService.GetLiveStreamsByCategoryId(Id, CategoryId);
+    }
+
+    private async Task SaveOverrides()
+    {
+        var overrides = streams
+            .Where(x => x.EpgChannelIdOverride != x.EpgChannelId &&  x.EpgChannelIdOverride != null)
+            .Select(p =>
+            {
+                return new Models.StreamChannelIdOverridesModel
+                {
+                    CategoryId = CategoryId,
+                    StreamId = p.StreamId,
+                    OriginalStreamChannelId = p.EpgChannelId,
+                    NewStreamChannelId = p.EpgChannelIdOverride
+                };
+            }).ToList();
+
+        await playlistService.AddChannelIdOverrides(Id, overrides);
+    }
+
+    private Color GetIconColorForStream(Models.Livestream livestream)
+    {
+        return string.IsNullOrEmpty(livestream.EpgChannelId) ? Color.Error : Color.Primary;
+    }
+
+    private string GetDefaultAutocompleteValue(string channelId)
+    {
+        if (Data.ChannelIds.UkChannelIds.Contains(channelId))
+            return channelId;
+        else
+            return "";
+    }
+
+    private async Task<IEnumerable<string>> GetChannelIds()
+    {
+        await Task.Delay(5);
+
+        return Data.ChannelIds.UkChannelIds;
+    }
+
+    private async Task<IEnumerable<string>> SearchChannels(string value)
+    {
+        await Task.Delay(1);
+
+        if (string.IsNullOrEmpty(value))
+            return Data.ChannelIds.UkChannelIds;
+        return Data.ChannelIds.UkChannelIds.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+}

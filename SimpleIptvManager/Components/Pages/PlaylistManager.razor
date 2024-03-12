@@ -1,0 +1,104 @@
+﻿@page "/playlistmanager"
+@attribute [StreamRendering]
+@inject Services.IPlaylistService playlistService
+
+<MudPaper Class="mt-4 pa-6">
+    <MudText Typo=Typo.h3>Playlists Manager</MudText>
+    <MudPaper Class="mt-8 pa-2">
+        <MudText Typo=Typo.h4>Add New Playlist:</MudText>
+        <MudForm @bind-IsValid="@validated">
+            <MudTextField @bind-Value="host" T="string" Label="Host" Required="true" RequiredError="Host is required!"></MudTextField>
+            <MudTextField @bind-Value="username" T="string" Label="Username" Required="true" RequiredError="Username is required!"></MudTextField>
+            <MudTextField @bind-Value="password" T="string" Label="Password" Required="true" RequiredError="Password is required!"></MudTextField>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto mt-2" OnClick="@((e) => SaveNewPlaylist())">Add Playlist</MudButton>
+        </MudForm>
+    </MudPaper>
+
+    <MudPaper Class="mt-16 pa-2">
+        <MudText Typo=Typo.h4>Saved Playlists:</MudText>
+
+        @if(playlists == null)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else if (playlists.Count <= 0)
+        {
+            <MudText Typo=Typo.body1>No playlists, add one and it will appear here...</MudText>
+        }
+        else
+        {
+            <MudList>
+                @foreach (var playlist in playlists)
+                {
+                    <MudListItem>
+                        <MudGrid>
+                        <MudItem xs="9">@GetPlaylistText(playlist)</MudItem>
+                        <MudItem xs="3">
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Href="@GetEditLink(playlist)"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => DeletePlaylist(playlist.PlaylistId))"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Download" aria-label="export" Href="@GetDownloadLink(playlist)"></MudIconButton>
+                        </MudItem>
+                        </MudGrid>
+                    </MudListItem>
+                    <MudDivider />
+                }
+            </MudList>
+        }
+
+    </MudPaper>
+
+</MudPaper>
+
+@code{
+    private List<Models.PlaylistModel>? playlists;
+    private string host { get; set; }
+    private string username { get; set; }
+    private string password { get; set; }
+    bool validated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        playlists = await playlistService.GetAllPlaylists();
+    }
+
+    private string GetPlaylistText(Models.PlaylistModel playlist)
+    {
+        return $"{playlist.Host}";
+    }
+
+    private string GetEditLink(Models.PlaylistModel playlist)
+    {
+        return $"/editcategory?id={playlist.PlaylistId}";
+    }
+    private string GetDownloadLink(Models.PlaylistModel playlist)
+    {
+        return $"/api/playlist/{playlist.PlaylistId}";
+    }
+
+    private async Task SaveNewPlaylist()
+    {
+        if (ValidateParameters())
+        {
+            await playlistService.AddPlaylist(host, username, password);
+            playlists = await playlistService.GetAllPlaylists();
+        }
+    }
+
+    private async Task DeletePlaylist(int id)
+    {
+        await playlistService.RemovePlaylist(id);
+        playlists = await playlistService.GetAllPlaylists();
+    }
+
+    private bool ValidateParameters()
+    {
+        var isMissingParameter = string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password);
+        if (isMissingParameter)
+            return false;
+
+        host = host.Trim();
+        username = username.Trim();
+        password = password.Trim();
+        return true;
+    }
+}
