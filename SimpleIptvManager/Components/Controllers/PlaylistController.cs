@@ -24,7 +24,7 @@ namespace SimpleIptvManager.Components.Controllers
         public async Task<ActionResult> GetEpg(int id)
         {
             var file = await _playlistService.GetPlaylistEpgFileAsBytes(id);
-            return File(file, "text/csv", $"{id}.xml");
+            return File(file, "text/xml", $"{id}.xml");
         }
     }
 }
