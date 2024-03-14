@@ -2,8 +2,9 @@
 {
     public static class AppConfiguration
     {
-        public static bool IsContainer => string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("IsContainer")) ? false : 
-            Environment.GetEnvironmentVariable("IsContainer").Equals("true");
+        public static bool IsContainer => string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER")) ? false :
+            Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER").Equals("true", StringComparison.InvariantCultureIgnoreCase) ||
+            Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER").Equals("1", StringComparison.InvariantCultureIgnoreCase);
         public static string ApplicationName => "SimpleIptvManager";
         public static string AppDataDirectory => IsContainer ? "/config" :
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ApplicationName);
