@@ -1,5 +1,6 @@
 ﻿using SimpleIptvManager.Components.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace SimpleIptvManager.Components.Controllers
 {
@@ -24,7 +25,7 @@ namespace SimpleIptvManager.Components.Controllers
         public async Task<ActionResult> GetEpg(int id)
         {
             var file = await _playlistService.GetPlaylistEpgFileAsBytes(id);
-            return File(file, "text/xml", $"{id}.xml");
+            return Content(Encoding.UTF8.GetString(file), "text/xml");
         }
     }
 }

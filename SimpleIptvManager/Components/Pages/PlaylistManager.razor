@@ -32,11 +32,12 @@
                 {
                     <MudListItem>
                         <MudGrid>
-                        <MudItem xs="9">@GetPlaylistText(playlist)</MudItem>
-                        <MudItem xs="3">
+                        <MudItem xs="8">@GetPlaylistText(playlist)</MudItem>
+                        <MudItem xs="4">
                             <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Href="@GetEditLink(playlist)"></MudIconButton>
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => DeletePlaylist(playlist.PlaylistId))"></MudIconButton>
-                            <MudIconButton Icon="@Icons.Material.Filled.Download" aria-label="export" Href="@GetDownloadLink(playlist)"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Download" aria-label="m3u" Href="@GetDownloadLink(playlist)" ></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.ListAlt" aria-label="epg" Href="@GetProgramGuideLink(playlist)"></MudIconButton>
                         </MudItem>
                         </MudGrid>
                     </MudListItem>
@@ -72,7 +73,12 @@
     }
     private string GetDownloadLink(Models.PlaylistModel playlist)
     {
-        return $"/api/playlist/{playlist.PlaylistId}";
+        return $"/playlist/{playlist.PlaylistId}/m3u";
+    }
+
+    private string GetProgramGuideLink(Models.PlaylistModel playlist)
+    {
+        return $"/playlist/{playlist.PlaylistId}/epg";
     }
 
     private async Task SaveNewPlaylist()
