@@ -1,4 +1,5 @@
 ﻿using SimpleIptvManager.Components.Clients;
+using System.Globalization;
 using System.Xml;
 
 namespace SimpleIptvManager.Components.Services
@@ -18,10 +19,9 @@ namespace SimpleIptvManager.Components.Services
 
         public async void SaveProgramGuideForPlaylist(int playlistId, List<string> channelsInPlaylist)
         {
-            await DownloadProgramGuide();
             var pathToFile = AppConfiguration.ProgramGuideSourcesDirectory;
             var sourceFiles = Directory.EnumerateFiles(pathToFile).ToList();
-            var sourceFile = sourceFiles.First();
+            var sourceFile = sourceFiles.Where(x=>x.Contains($"{playlistId}_epg")).OrderBy(x=>x).First();
 
             var trimmedEpg = TrimEpgFile(sourceFile, channelsInPlaylist);
             CreateFile(AppConfiguration.PlaylistAndGuideDirectory, playlistId, trimmedEpg);

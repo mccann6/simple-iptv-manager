@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.VisualBasic;
+using System.IO;
 using System.IO.Compression;
+using System.Text;
 
 namespace SimpleIptvManager.Components.Clients
 {
@@ -15,6 +18,18 @@ namespace SimpleIptvManager.Components.Clients
         public async Task DownloadUkProgramGuide()
         {
             await DownloadProgramGuide(_ukProgramGuide);
+        }
+
+        public async Task DownloadProgramGuide(int playlistId, string programGuideUrl)
+        {
+            var file = await DoHttpGet(programGuideUrl)
+            ?? throw new FileNotFoundException();
+            var pathToWrite = AppConfiguration.ProgramGuideSourcesDirectory;
+            Directory.CreateDirectory(pathToWrite);
+            var fileText = Encoding.UTF8.GetString(file);
+            var cleanedFileText = fileText.Substring(0, fileText.LastIndexOf("</tv>") + 5);
+            
+            await File.WriteAllTextAsync(Path.Combine(pathToWrite, GetFileName(playlistId)), cleanedFileText);
         }
 
         private async Task DownloadProgramGuide(string programGuideName)
@@ -35,6 +50,11 @@ namespace SimpleIptvManager.Components.Clients
         private string GetFileName()
         {
             return $"uk_epg_{DateTime.UtcNow.ToString("yyyyMMdd")}.xml";
+        }
+
+        private string GetFileName(int playlistId)
+        {
+            return $"{playlistId}_epg_{DateTime.UtcNow.ToString("yyyyMMdd")}.xml";
         }
 
         private byte[] DecompressFile(byte[] compressedFileBytes)

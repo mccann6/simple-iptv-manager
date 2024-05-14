@@ -38,6 +38,7 @@
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => DeletePlaylist(playlist.PlaylistId))"></MudIconButton>
                             <MudIconButton Icon="@Icons.Material.Filled.Download" aria-label="m3u" Href="@GetDownloadLink(playlist)" ></MudIconButton>
                             <MudIconButton Icon="@Icons.Material.Filled.ListAlt" aria-label="epg" Href="@GetProgramGuideLink(playlist)"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Filled.Update" aria-label="update_epg_source" OnClick="@((e) => UpdateEpg(playlist))"></MudIconButton>
                         </MudItem>
                         </MudGrid>
                     </MudListItem>
@@ -79,6 +80,11 @@
     private string GetProgramGuideLink(Models.PlaylistModel playlist)
     {
         return $"/playlist/{playlist.PlaylistId}/epg";
+    }
+
+    private async Task UpdateEpg(Models.PlaylistModel playlist)
+    {
+        await playlistService.DownloadProgramGuideForPlaylist(playlist.PlaylistId);       
     }
 
     private async Task SaveNewPlaylist()

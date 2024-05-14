@@ -2,6 +2,7 @@
 using SimpleIptvManager.Components.Clients;
 using SimpleIptvManager.Components.Data;
 using SimpleIptvManager.Components.Models;
+using System.Globalization;
 using System.Text;
 
 namespace SimpleIptvManager.Components.Services
@@ -10,15 +11,17 @@ namespace SimpleIptvManager.Components.Services
     {
         private readonly IPlaylistRepository _playlistRepository;
         private readonly ITvStreamsClient _tvStreamsClient;
+        private readonly IProgramGuideClient _programGuideClient;
         private readonly IMapper _mapper;
         private readonly IProgramGuideService _programGuideService;
 
-        public PlaylistService(IPlaylistRepository playlistRepository, ITvStreamsClient client, IMapper mapper, IProgramGuideService programGuideService)
+        public PlaylistService(IPlaylistRepository playlistRepository, ITvStreamsClient client, IMapper mapper, IProgramGuideService programGuideService, IProgramGuideClient programGuideClient)
         {
             _playlistRepository = playlistRepository;
             _tvStreamsClient = client;
             _mapper = mapper;
             _programGuideService = programGuideService;
+            _programGuideClient = programGuideClient;
         }
         public async Task<PlaylistModel> AddPlaylist(string host, string username, string password)
         {
@@ -31,6 +34,9 @@ namespace SimpleIptvManager.Components.Services
             };
 
             var pla = await _playlistRepository.CreateOrUpdate(playlist);
+
+            _ = Task.Run(async () => await DownloadProgramGuideForPlaylist(pla.PlaylistId));
+
             return _mapper.Map<PlaylistModel>(pla);
         }
 
@@ -143,12 +149,48 @@ namespace SimpleIptvManager.Components.Services
             await _playlistRepository.CreateOrUpdate(playlist);
         }
 
+        public async Task DownloadProgramGuideForPlaylist(int playlistId)
+        {
+            var playlist = await GetPlaylistById(playlistId);
+            var programGuideUrl = $"{playlist.Host}/xmltv.php?username={playlist.Username}&password={playlist.Password}";
+
+            await _programGuideClient.DownloadProgramGuide(playlistId, programGuideUrl);
+        }
+
+        private bool ShouldUpdateProgramGuideSourceForPlaylist(int playlistId)
+        {
+            var pathToFile = AppConfiguration.ProgramGuideSourcesDirectory;
+            var sourceFiles = Directory.EnumerateFiles(pathToFile).ToList();
+            var provider = CultureInfo.InvariantCulture;
+            //var sourceFile = sourceFiles.Where(x => x.Contains($"{playlistId}_epg")).OrderByDescending(x => x).First();
+            var sourceFile = sourceFiles.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith($"{playlistId}_epg")).OrderByDescending(x => DateTime.ParseExact(Path.GetFileNameWithoutExtension(x).Split('_')[2], "yyyyMMdd", provider)).First();
+
+            
+            var fileName = Path.GetFileNameWithoutExtension(sourceFile);
+            var dateStr = fileName.Split('_')[2];
+            var dateOfFile = DateTime.ParseExact(dateStr, "yyyyMMdd", provider);
+
+            if ((DateTime.UtcNow - dateOfFile).TotalDays >= 3)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
         public async Task CreatePlaylistAndProgramGuideForPlaylist(int playlistId)
         {
             var playlist = await CreatePlaylistWithCategoriesStreams(playlistId);
             var (Channels, Text) = CreateM3uText(playlist);
 
             CreateFile(AppConfiguration.PlaylistAndGuideDirectory, playlistId, Text);
+
+            if (ShouldUpdateProgramGuideSourceForPlaylist(playlistId))
+            {
+                _ = Task.Run(async () => await DownloadProgramGuideForPlaylist(playlistId));
+            }
+
             _programGuideService.SaveProgramGuideForPlaylist(playlistId, Channels);
         }
 
@@ -199,7 +241,8 @@ namespace SimpleIptvManager.Components.Services
                 {
                     sb.AppendLine($"#EXTINF:-1 xcms-id=\"{{XCMS_ID}}\" tvg-id=\"{livestream.EpgChannelIdOverride}\" tvg-name=\"{livestream.Name}\" tvg-logo=\"{livestream.StreamIcon}\" group-title=\"{category.Category.CategoryName}\",{livestream.Name}");
                     sb.AppendLine($"{playlist.Host}/{playlist.Username}/{playlist.Password}/{livestream.StreamId}");
-                    listOfChannelsAddedToPlaylist.Add(livestream.EpgChannelIdOverride);
+                    if(livestream.EpgChannelIdOverride != null)
+                        listOfChannelsAddedToPlaylist.Add(livestream.EpgChannelIdOverride);
                 }
             }
             return (listOfChannelsAddedToPlaylist, sb.ToString());

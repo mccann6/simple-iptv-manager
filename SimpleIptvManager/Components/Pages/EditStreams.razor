@@ -19,11 +19,7 @@ else
                 <MudListItem Icon="@Icons.Material.Filled.LiveTv" IconColor="GetIconColorForStream(stream)">
                     <MudGrid>
                         <MudItem xs="8">@stream.Name</MudItem>
-                        <MudItem xs="3">
-                                    <MudAutocomplete T="string" Label="Channel Id" @bind-Value="@stream.EpgChannelIdOverride" SearchFunc="@SearchChannels"
-                                                ResetValueOnEmptyText="false"
-                                                CoerceText="false" CoerceValue="false" />
-                        </MudItem>
+                        <MudItem xs="3">@stream.EpgChannelId</MudItem>
                         <MudItem xs="1">
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => AddToStreamExclusion(stream.StreamId))"></MudIconButton>
                         </MudItem>
@@ -81,29 +77,5 @@ else
     private Color GetIconColorForStream(Models.Livestream livestream)
     {
         return string.IsNullOrEmpty(livestream.EpgChannelId) ? Color.Error : Color.Primary;
-    }
-
-    private string GetDefaultAutocompleteValue(string channelId)
-    {
-        if (Data.ChannelIds.UkChannelIds.Contains(channelId))
-            return channelId;
-        else
-            return "";
-    }
-
-    private async Task<IEnumerable<string>> GetChannelIds()
-    {
-        await Task.Delay(5);
-
-        return Data.ChannelIds.UkChannelIds;
-    }
-
-    private async Task<IEnumerable<string>> SearchChannels(string value)
-    {
-        await Task.Delay(1);
-
-        if (string.IsNullOrEmpty(value))
-            return Data.ChannelIds.UkChannelIds;
-        return Data.ChannelIds.UkChannelIds.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 }

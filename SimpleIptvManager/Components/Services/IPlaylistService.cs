@@ -18,5 +18,6 @@ namespace SimpleIptvManager.Components.Services
         Task CreatePlaylistAndProgramGuideForPlaylist(int playlistId);
         Task<byte[]> GetPlaylistM3uFileAsBytes(int playlistId);
         Task<byte[]> GetPlaylistEpgFileAsBytes(int playlistId);
+        Task DownloadProgramGuideForPlaylist(int playlistId);
     }
 }
