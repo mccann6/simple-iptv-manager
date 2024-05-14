@@ -18,7 +18,8 @@ namespace SimpleIptvManager.Components.Controllers
         public async Task<ActionResult> GetM3u(int id)
         {
             var file = await _playlistService.GetPlaylistM3uFileAsBytes(id);
-            return File(file, "text/csv", $"{id}.m3u");
+            
+            return File(file, "text/plain", $"{id}.m3u");
         }
 
         [HttpGet("{id}/epg")]
