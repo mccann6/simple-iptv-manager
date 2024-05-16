@@ -19,7 +19,7 @@ else
                 <MudListItem Icon="@Icons.Material.Filled.LiveTv" IconColor="GetIconColorForStream(stream)">
                     <MudGrid>
                         <MudItem xs="8">@stream.Name</MudItem>
-                        <MudItem xs="3">@stream.EpgChannelId</MudItem>
+                        <MudTextField @bind-Value="@stream.EpgChannelIdOverride" T="string" xs="3"></MudTextField>
                         <MudItem xs="1">
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" OnClick="@((e) => AddToStreamExclusion(stream.StreamId))"></MudIconButton>
                         </MudItem>

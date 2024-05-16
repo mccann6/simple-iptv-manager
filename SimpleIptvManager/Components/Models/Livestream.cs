@@ -19,12 +19,7 @@ namespace SimpleIptvManager.Components.Models
             {
                 if (string.IsNullOrWhiteSpace(_epgChannelIdOverride))
                 {
-                    //if (ChannelIds.UkChannelIds.Contains(EpgChannelId))
-                    //{
-                        return EpgChannelId;
-                    //}
-
-                    //return _epgChannelIdOverride;
+                    return EpgChannelId;
                 }
                 else
                 {
