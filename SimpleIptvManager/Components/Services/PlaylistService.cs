@@ -162,7 +162,6 @@ namespace SimpleIptvManager.Components.Services
             var pathToFile = AppConfiguration.ProgramGuideSourcesDirectory;
             var sourceFiles = Directory.EnumerateFiles(pathToFile).ToList();
             var provider = CultureInfo.InvariantCulture;
-            //var sourceFile = sourceFiles.Where(x => x.Contains($"{playlistId}_epg")).OrderByDescending(x => x).First();
             var sourceFile = sourceFiles.Where(x => Path.GetFileNameWithoutExtension(x).StartsWith($"{playlistId}_epg")).OrderByDescending(x => DateTime.ParseExact(Path.GetFileNameWithoutExtension(x).Split('_')[2], "yyyyMMdd", provider)).First();
 
             
