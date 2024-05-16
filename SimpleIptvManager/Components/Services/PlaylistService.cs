@@ -251,7 +251,7 @@ namespace SimpleIptvManager.Components.Services
         {
             var pathToFile = Path.Combine(AppConfiguration.PlaylistAndGuideDirectory, playlistId.ToString());
             var maybeFilePath = Path.Combine(pathToFile, GetFileName(playlistId));
-            if (File.Exists(maybeFilePath) && (DateTime.UtcNow - File.GetCreationTimeUtc(maybeFilePath) > TimeSpan.FromDays(1)))
+            if (File.Exists(maybeFilePath) && (DateTime.UtcNow - File.GetCreationTimeUtc(maybeFilePath) < TimeSpan.FromDays(1)))
             {
                 return await File.ReadAllBytesAsync(maybeFilePath);
             }
@@ -263,7 +263,7 @@ namespace SimpleIptvManager.Components.Services
         {
             var pathToFile = Path.Combine(AppConfiguration.PlaylistAndGuideDirectory, playlistId.ToString());
             var maybeFilePath = Path.Combine(pathToFile, GetProgramGuideFileName(playlistId));
-            if (File.Exists(maybeFilePath) && (DateTime.UtcNow - File.GetCreationTimeUtc(maybeFilePath) > TimeSpan.FromDays(1)))
+            if (File.Exists(maybeFilePath) && (DateTime.UtcNow - File.GetCreationTimeUtc(maybeFilePath) < TimeSpan.FromDays(1)))
             {
                 return await File.ReadAllBytesAsync(maybeFilePath);
             }
