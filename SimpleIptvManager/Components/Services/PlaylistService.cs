@@ -185,11 +185,12 @@ namespace SimpleIptvManager.Components.Services
 
             CreateFile(AppConfiguration.PlaylistAndGuideDirectory, playlistId, Text);
 
-            if (ShouldUpdateProgramGuideSourceForPlaylist(playlistId))
-            {
-                _ = Task.Run(async () => await DownloadProgramGuideForPlaylist(playlistId));
-            }
+            //if (ShouldUpdateProgramGuideSourceForPlaylist(playlistId))
+            //{
+            //    _ = Task.Run(async () => await DownloadProgramGuideForPlaylist(playlistId));
+            //}
 
+            await DownloadProgramGuideForPlaylist(playlistId);
             _programGuideService.SaveProgramGuideForPlaylist(playlistId, Channels);
         }
 
