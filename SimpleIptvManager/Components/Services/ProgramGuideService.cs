@@ -1,22 +1,9 @@
-﻿using SimpleIptvManager.Components.Clients;
-using System.Globalization;
-using System.Xml;
+﻿using System.Xml;
 
 namespace SimpleIptvManager.Components.Services
 {
     public class ProgramGuideService : IProgramGuideService
     {
-        private readonly IProgramGuideClient _programGuideClient;
-        public ProgramGuideService(IProgramGuideClient programGuideClient)
-        {
-            _programGuideClient = programGuideClient;
-        }
-
-        public async Task DownloadProgramGuide()
-        {
-            await _programGuideClient.DownloadUkProgramGuide();
-        }
-
         public async void SaveProgramGuideForPlaylist(int playlistId, List<string> channelsInPlaylist)
         {
             var pathToFile = AppConfiguration.ProgramGuideSourcesDirectory;
